@@ -24,7 +24,8 @@
 </head>
 <body>
 {% block body %}
-    <div class="container-fluid ">
+  <div id="loader"></div>
+    <div class="container-fluid">
         {% block progress_bar %}
             <div class="row">
                 <div class="progress">
@@ -157,6 +158,8 @@
         var tree = {{ fileManager.tree ? 'true' : 'false' }}
         var moduleName = '{{ fileManager.module ? fileManager.module : 0 }}';
         var successMessage = '{{ 'file.add.success'|trans }}';
+        var view = '{{ fileManager.view }}';
+        var total = '{{ total }}';
         var url = "{{ path('file_manager', fileManager.queryParameters|merge({'json':true}))|e('js') }}"
         var urldelete = "{{ path('file_manager_delete', fileManager.queryParameters )|e('js') }}"
         var deleteMessage = "{{ 'title.delete'|trans }}"
