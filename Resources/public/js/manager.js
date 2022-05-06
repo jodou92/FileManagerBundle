@@ -294,5 +294,106 @@ $(function () {
         });
 
     });
+
+    const hideLoader = () => {
+        loaderEl.classList.remove('show');
+    };
+
+    const showLoader = () => {
+        loaderEl.classList.add('show');
+    };
+
+    const getTotal = () => {
+        if (view === 'list') {
+            return $('#form-multiple-delete tbody tr').length;
+        } else if (view === 'thumbnail') {
+            return $('#form-multiple-delete .file-wrapper').length;
+        }
+
+        return 0;
+    };
+
+    const getItems = async (page, limit) => {
+        const API_URL = url + `&page=${page}&limit=${limit}`;
+        const response = await fetch(API_URL);
+        // handle 404
+        if (!response.ok) {
+            throw new Error(`An error occurred: ${response.status}`);
+        }
+        return await response.json();
+    }
+
+    const showItems = (items) => {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(items, 'text/html');
+
+        if (view === 'list') {
+            var elements = doc.getElementsByTagName('tbody')[0];
+            $('#form-multiple-delete tbody').append(elements.innerHTML);
+        } else if (view === 'thumbnail') {
+            var elements = doc.getElementsByClassName('file-wrapper');
+            for (var i = 0; i < elements.length; i++) {
+                $('#form-multiple-delete .thumbnail-blk').append(elements[i].outerHTML);
+            }
+        }
+
+        isLoading = false;
+        lazy();
+    };
+
+    const hasMoreElements = () => {
+        return getTotal() < total;
+    };
+
+    const loadItems = async (page, limit) => {
+        isLoading = true;
+        showLoader();
+
+        setTimeout(async () => {
+            try {
+                // if having more quotes to fetch
+                if (hasMoreElements()) {
+                    // call the API to get quotes
+                    const response = await getItems(page, limit);
+                    // show quotes
+                    showItems(response.data);
+
+                    if (document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+                        currentPage++;
+                        loadItems(currentPage, 10);
+                    }
+                }
+            } catch (error) {
+                console.log(error.message);
+            } finally {
+                hideLoader();
+            }
+        }, 50);
+
+    };
+
+    let isLoading = false;
+    let currentPage = 1;
+    const loaderEl = document.querySelector('#loader');
+
+    if (document.documentElement.clientHeight >= document.documentElement.scrollHeight) {
+        currentPage++;
+        loadItems(currentPage, 10);
+    }
+
+    window.addEventListener('scroll', () => {
+        const {
+            scrollTop,
+            scrollHeight,
+            clientHeight
+        } = document.documentElement;
+
+        if (scrollTop + clientHeight >= scrollHeight - 5 && !isLoading && hasMoreElements()) {
+            currentPage++;
+            loadItems(currentPage, 10);
+        }
+    }, {
+        passive: true
+    });
 })
 ;

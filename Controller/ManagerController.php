@@ -110,7 +110,12 @@ class ManagerController extends AbstractController {
 
         $formDelete = $this->createDeleteForm()->createView();
         $fileArray = [];
-        foreach ($finderFiles as $file) {
+
+        $page = $request->get('page') !== null ? $request->get('page') : 1;
+        $limit = $request->get('limit') !== null ? $request->get('limit') : 10;
+        $total = count($finderFiles->getIterator()->getArrayCopy());
+
+        foreach (array_slice($finderFiles->getIterator()->getArrayCopy(), ($limit*$page-$limit), $limit) as $file) {
             $fileArray[] = new File($file, $this->translator, $fileTypeService, $fileManager);
         }
 
@@ -142,6 +147,7 @@ class ManagerController extends AbstractController {
             'fileManager' => $fileManager,
             'fileArray' => $fileArray,
             'formDelete' => $formDelete,
+            'total' => $total
         ];
         if ($isJson) {
             $fileList = $this->renderView('@ArtgrisFileManager/views/_manager_view.html.twig', $parameters);
