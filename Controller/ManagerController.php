@@ -135,13 +135,14 @@ class ManagerController extends AbstractController
         $this->dispatch(FileManagerEvents::POST_FILE_FILTER_CONFIGURATION, ['finder' => $finderFiles]);
 
         $formDelete = $this->createDeleteForm()->createView();
+
+        $defaultPage = $request->get('page') ?: $fileManager->getConfiguration()['manager_default_page'];
+        $nbItemsByPage = $request->get('limit') ?: $fileManager->getConfiguration()['manager_nb_items_by_page'];
+        $finderFilesAsArray = $finderFiles->getIterator()->getArrayCopy();
+        $filesCount = count($finderFilesAsArray);
         $fileArray = [];
 
-        $page = $request->get('page') !== null ? $request->get('page') : 1;
-        $limit = $request->get('limit') !== null ? $request->get('limit') : 10;
-        $total = count($finderFiles->getIterator()->getArrayCopy());
-
-        foreach (array_slice($finderFiles->getIterator()->getArrayCopy(), ($limit*$page-$limit), $limit) as $file) {
+        foreach (array_slice($finderFilesAsArray, ($nbItemsByPage * $defaultPage - $nbItemsByPage), $nbItemsByPage) as $file) {
             $fileArray[] = new File($file, $this->translator, $fileTypeService, $fileManager);
         }
 
@@ -173,7 +174,9 @@ class ManagerController extends AbstractController
             'fileManager' => $fileManager,
             'fileArray' => $fileArray,
             'formDelete' => $formDelete,
-            'total' => $total
+            'filesCount' => $filesCount,
+            'defaultPage' => $defaultPage,
+            'nbItemsByPage' => $nbItemsByPage
         ];
         if ($isJson) {
             $fileList = $this->renderView('@ArtgrisFileManager/views/_manager_view.html.twig', $parameters);

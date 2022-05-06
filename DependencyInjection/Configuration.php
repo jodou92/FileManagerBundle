@@ -58,6 +58,8 @@ class Configuration implements ConfigurationInterface
                                     ->booleanNode('override')->defaultValue(false)->end()
                                 ->end()
                             ->end()
+                            ->integerNode('manager_default_page')->defaultValue(1)->end()
+                            ->integerNode('manager_nb_items_by_page')->defaultValue(10)->end()
                         ->end()
                     ->end()
                 ->end()

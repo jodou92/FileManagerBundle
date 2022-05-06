@@ -1,4 +1,4 @@
-<div class="row margin-bottom thumbnail-blk">
+<div class="row margin-bottom thumbnail-blk js-artgris-filemanager-list-items-container">
     {% block select_all %}
         <div class="col-md-12 select-all">
             <input type="checkbox" id="select-all" title="{{ 'select-all'|trans }}"> <label
@@ -7,7 +7,7 @@
     {% endblock %}
     {% for fileEntity in fileArray %}
         {% set file = fileEntity.file %}
-        <div class="file-wrapper {{ fileEntity.isImage() ? 'img' : file.type }} col-xs-6 col-sm-4 col-md-{{ fileManager.tree == 0 ? 3 : 4 }} col-lg-2 text-center thumbnail">
+        <div class="file-wrapper {{ fileEntity.isImage() ? 'img' : file.type }} col-xs-6 col-sm-4 col-md-{{ fileManager.tree == 0 ? 3 : 4 }} col-lg-2 text-center thumbnail js-artgris-filemanager-list-item">
             {% block file_checkbox %}
                 <input type="checkbox" class="checkbox" name="delete[]"
                        value="{{ file.fileName }}"
