@@ -52,7 +52,11 @@ class FileTypeService
         }
         if ('dir' === $type) {
             $href = $this->router->generate('file_manager', array_merge($fileManager->getQueryParameters(),
-                ['route' => $fileManager->getRoute() . '/' . rawurlencode($file->getFilename())]));
+                [
+                    'route' => $fileManager->getRoute() . '/' . rawurlencode($file->getFilename()),
+                    'page' => $fileManager->getConfiguration()['manager_default_page'],
+                    'limit' => $fileManager->getConfiguration()['manager_nb_items_by_page']
+                ]));
 
             return [
                 'path' => $filePath,
